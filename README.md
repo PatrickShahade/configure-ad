@@ -173,24 +173,31 @@ Back in DC as jane_admin, we can check our Active Directory Users and Computers 
 </p>
 
 <p>
-text
+Back in Client-1, we're going to log in as our jane_admin. This may take a few minutes. Once logged in, right click start and go to system. We're looking for Remote Desktop. Under User Accounts, we can select users to remotely access this PC, and add Domain Users. We can, and normally would make a Group Policy to do this and change many systems at once.
 </p>
 <p>
-<img src=/>
-</p>
-
-<p>
-text
-</p>
-<p>
-<img src=/>
+<img src=https://i.imgur.com/8Gszr8X.png/>
+  <img src=https://i.imgur.com/OouSHFP.png/>
 </p>
 
 <p>
-text
+At this point, we need some users to play around with, so we'll go back to our DC-1 as jane_admin and start up Powershell ISE as an administrator. From within, we'll create a new file and we'll paste a script into it that will generate some random users for us. I'm using this one: (insert link here). I'll save the script as "CreateUsers" and just save it to the desktop. This will generate a bunch of new users for us when we run it, so we'll run it (F5 or the green arrow on the toolbar up top) and we can watch it go! In our ADUC we can see all the users already generated. 
 </p>
 <p>
-<img src=/>
+<img src=https://i.imgur.com/wBfZRfS.png/>
+  <img src=https://i.imgur.com/bxGxLka.png/>
+  <img src=https://i.imgur.com/bFmyhIR.png/>
+  <img src=https://i.imgur.com/pdPoeUj.png/>
+  <img src=https://i.imgur.com/eakBXKN.png/>
+</p>
+
+<p>
+We're going to pick one of these users to log in to our Client-1 with. This script generates them all with "Password1" as the password. I'm just going to pick one and give it a go! My target is dane.wafu. I still need to specify the context, so I'll login using "mydomain.con\dane.wafu". It's like magic to see things working, isn't it? I just opened Powershell to confirm I am indeed dane.wafu. Huzzah. 
+</p>
+<p>
+<img src=https://i.imgur.com/kAnW4rV.png/>
+  <img src=https://i.imgur.com/bZ5keOt.png/>
+  <img src=https://i.imgur.com/6sm1JGo.png/>
 </p>
 
 <p>

@@ -201,6 +201,59 @@ We're going to pick one of these users to log in to our Client-1 with. This scri
 </p>
 
 <p>
+Now let's do a bit of testing and just get a feel for how account lockouts and password resets happen. Currently there is no threshold for this, so we could fail the password unlimited times. That's not safe! So we'll set a group policy for this. I'm going to open up Active Directory Users and Computers and find our user from before. We'll need to navigate here later, so I just want to have our user located already. 
+</p>
+<p>
+<img src=https://i.imgur.com/Q0vPgrn.png/>
+  <img src=https://i.imgur.com/iolMH2X.png/>
+</p>
+<br />
+
+<p>
+So, to get our passwords to lock out after a few attempts, we're going to use the search bar in DC to look for "Group Policy Management". We can expand Forest:mydomain.com > Domains > mydomain.com and see "Default Domain Policy". We want to edit this with a right click. You may want to expand this window if you haven't already. We're looking to expand Computer Configuration > Policies > Window Settings > Security Settings > Account Policies > Account Lockout Policy. Feels a bit like a run-on sentence, but now we can set up some rules to test. Under the Account Lockout Policy, we're going to rightclick the account lockout duration properties and set it to 15 minutes. It should default the logon attempts to 5 after this. It may take a moment for our policy to refresh, but it doesn't take long. 
+</p>
+<p>
+<img src=https://i.imgur.com/qicdw5P.png/>
+  <img src=https://i.imgur.com/icv4F1D.png/>
+  <img src=https://i.imgur.com/LOA6rmV.png/>
+</p>
+<br />
+
+<p>
+If we go to our Client-1 and attempt to logon incorrectly six times, we should be notified that we are locked out. If we look up our user on the DC in ADUC, we can look at their account and see that it is currently locked out because a box to unlock their account is now available for us to tick. We'll tick that box, Apply and OK and try to logon correctly now. We are now back in successfully!
+</p>
+<p>
+  <img src=https://i.imgur.com/b6f30dk.png/>
+<img src=https://i.imgur.com/JoApDo0.png/>
+  <img src=https://i.imgur.com/UYlWFUw.png/>
+  <img src=https://i.imgur.com/HTqTmmR.png/>
+  <img src=https://i.imgur.com/J1PYEed.png/>
+</p>
+<br />
+
+<p>
+Back in our Domain Controller, we're going to manually disable the account. If we find our user account like we have before in the ADUC, we can rightclick it and disable it. We can also do this from the account options. There's a box under where we unlocked it for the bad login attempts. Your choice. We can see what this looks like as our user by trying to logon again. We can just enable it by reversing this similar to how we disabled it. 
+</p>
+<p>
+<img src=https://i.imgur.com/dsTGSQ5.png/>
+  <img src=https://i.imgur.com/LYMdfZZ.png/>
+  <img src=https://i.imgur.com/NhWocLR.png/>
+  <img src=https://i.imgur.com/TASDsn5.png/>
+</p>
+<br />
+
+<p>
+We're going to take a look at the logs in the Client by opening the Event Viewer. I'm opening it as an admin so it will prompt me to use admin credentials. Even though we are logged into the Client-1 as our random user, if we have admin credentials we can still open it as our admin user. We can look under the Windows Logs and check Security to see related logs. If we use the find option, we can search our user and scroll through to see all of our "audit failures".
+</p>
+<p>
+<img src=https://i.imgur.com/e0NEWnS.png/>
+  <img src=https://i.imgur.com/AlF8zyu.png/>
+  <img src=https://i.imgur.com/7bup8UG.png/>
+  <img src=https://i.imgur.com/a3yBCXL.png/>
+</p>
+<br />
+
+<p>
 text
 </p>
 <p>

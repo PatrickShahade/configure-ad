@@ -86,7 +86,7 @@ I've restarted Client-1, and now I'm going to log in and try to ping our DC-1's 
 <br />
 
 <p>
-On the Domain Controller, we can turn off the firewalls to do our test ping by searching wf.msc. Within this window we can change the firewall properties, and just turn off the private firewall. Apply and Ok. Then we should be able to ping. 
+On the Domain Controller, we can turn off the firewalls to do our test ping by searching wf.msc. Within this window we can change the firewall properties, and just turn off the private firewall. Apply and Ok. Then we should be able to ping our DC unit from our Client unit. 
 </p>
 <p>
 <img src=https://i.imgur.com/rmI70ND.png/>
@@ -95,6 +95,103 @@ On the Domain Controller, we can turn off the firewalls to do our test ping by s
   
 </p>
 <br />
+Within DC we can now install Active Directory Domain Services. From our Server Manager (if it isn't already open for you, just locate it via the search bar), we're going to add roles and features. We only have one server option here, so we just continue and select Active Directory Domain Services and then add features. We can continue up to this point where it asks us if we want to restart if required. We'll check that box, say yes and install. 
+<p>
+</p>
+<p>
+<img src=https://i.imgur.com/W2mmocE.png/>
+  <img src=https://i.imgur.com/qpJJ8nr.png/>
+  <img src=https://i.imgur.com/bbw3Wgy.png/>
+  <img src=https://i.imgur.com/BnsBeHh.png/>
+  <img src=https://i.imgur.com/8z1AZtD.png/>
+  <img src=https://i.imgur.com/fbRBBZo.png/>
+  <img src=https://i.imgur.com/tgGhdIT.png/>
+</p>
+
+<p>
+At this point, we're going to configure our DC to become a Domain Controller proper. From the Server Manager, we can see this flag prompting us. We'll promote this server to a domain controller and then opt to "add a new forest". We will just use "mydomain.com" as our root domain name. For the DSRM password we shouldn't ever need this, but still use something you can remember. We'll uncheck this "specify DNS delegation options" box and we can continue until we are prompted to install. After this finishes, it should automatically restart. 
+</p>
+<p>
+<img src=https://i.imgur.com/JYSelxV.png/>
+  <img src=https://i.imgur.com/L1WQdXO.png/>
+  <img src=https://i.imgur.com/YK2ZmLk.png/>
+  <img src=https://i.imgur.com/R5o9bF4.png/>
+  <img src=https://i.imgur.com/1mAFYqd.png/>
+</p>
+
+<p>
+Now that DC is an actual Domain Controller, when we log back in, we need to specify the context in which we want to log back in. So to do this, we specify that we want to log into "mydomain.com" then using a "\" with the username. 
+</p>
+<p>
+<img src=https://i.imgur.com/WSRJDhy.png/>
+</p>
+
+<p>
+Next we'll create an Organizational Unit (OU) to contain our users and admins so we can do some testing later on. We do need to be specific in how we name these now, because it will impact us later. So we're going to use our start menu to open up Active Directory Users and Computers. We can take a look at mydomain.com's users, and computers here naturally so we see our "labuser" and DC-1. We're going to right click mydomain.com and add our OU for _EMPLOYEES and _ADMINS. We also want to add an admin, so we'll rightclick and create a new user in our _ADMINS folder. We'll keep it simple and add Jane Doe, password can be whatever we want as long as we remember it. I unticked the box for the prompt to change the password at next logon. 
+</p>
+<p>
+<img src=https://i.imgur.com/8Rw4WOI.png/>
+  <img src=https://i.imgur.com/P3I7q4o.png/>
+  <img src=https://i.imgur.com/XyTXKQU.png/>
+  <img src=https://i.imgur.com/38G7LYj.png/>
+  <img src=https://i.imgur.com/N2A2CPC.png/>
+  <img src=https://i.imgur.com/yLuopkX.png/>
+  <img src=https://i.imgur.com/OU3XUj6.png/>
+  <img src=https://i.imgur.com/mC2H2zu.png/>
+  <img src=https://i.imgur.com/ykdcdhZ.png/>
+  <img src=https://i.imgur.com/rDCLFpY.png/>
+  <img src=https://i.imgur.com/2yQe9H9.png/>
+</p>
+
+<p>
+This account isn't an admin yet, despite us naming it admin and putting it in our admin group. We need to make a few changes. We'll change the properties by finding the "member of" tab and adding it to the "domain admins" built in group (click the check names button to make sure it locates it). Apply, OK and we can log out and then back in as our "jane_admin" user. 
+</p>
+<p>
+<img src=https://i.imgur.com/cjqMSrd.png/>
+  <img src=https://imgur.com/a/3TeHvvo/>
+  <img src=https://i.imgur.com/PLtrXS3.png/>
+  <img src=https://i.imgur.com/qs3dNRe.png/>
+</p>
+
+<p>
+Back on our Client-1, we're going to connect to our new domain. We can do this by rightclicking the start menu and selecting system. From here we can choose to "rename this PC (advanced)". We want to select change under the Computer Name tab, select Domain and put our "mydomain.com" or your selected domain name. Using our new admin, jane_admin's credentials we can OK this, get a sound notification of approval and a small popup in the back to let us know it worked. We'll be prompted to close our windows and restart. 
+</p>
+<p>
+<img src=https://i.imgur.com/uV3rIb5.png/>
+  <img src=https://i.imgur.com/GOakVYe.png/>
+  <img src=https://i.imgur.com/JvmWmPq.png/>
+  <img src=https://i.imgur.com/kHgJuYR.png/>
+  <img src=https://i.imgur.com/gVTSKUE.png/>
+</p>
+
+<p>
+Back in DC as jane_admin, we can check our Active Directory Users and Computers and verify that our Client-1 is part of our domain now. We're going to put it in a new OU and name it _CLIENTS and put our Client-1 in there. This isn't absolutely necessary, but just to keep it organized, we will. 
+</p>
+<p>
+<img src=https://i.imgur.com/0LToeMq.png/>
+  <img src=https://i.imgur.com/UcWVWfv.png/>
+</p>
+
+<p>
+text
+</p>
+<p>
+<img src=/>
+</p>
+
+<p>
+text
+</p>
+<p>
+<img src=/>
+</p>
+
+<p>
+text
+</p>
+<p>
+<img src=/>
+</p>
 
 <p>
 text

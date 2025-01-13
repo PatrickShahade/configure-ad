@@ -258,3 +258,7 @@ This tutorial is a step by step implementation of on-premises Active Directory w
   <img src=https://i.imgur.com/a3yBCXL.png/>
 </p>
 <br />
+
+<p>
+We've done it all. Created a Virtual Network and VMs to operate as Domain Controller and Client. Configured the DC DNS and linked the Client machine to it. Installed ADDS on the Domain Controller. Created Orginazational Units to contain users and admins and linked the Client to the Domain. Generated users with Powershell and made a Group Policy for them. Tested the account lockouts and enable/disable accounts features and reviewed the event logs. Quite a long list, but we made it. Thank you for following along!
+</p>

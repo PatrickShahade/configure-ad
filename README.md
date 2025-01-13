@@ -20,15 +20,22 @@ This tutorial outlines the implementation of on-premises Active Directory within
 
 <h2>High-Level Deployment and Configuration Steps</h2>
 
-- Step 1
-- Step 2
-- Step 3
-- Step 4
+- Create a Virtual Network
+- Create Virtual Machines to operate as Domain Controller and Client
+- Configure Domain Controller DNS
+- Link Client machine to Domain Controller
+- Install Active Directory Domain Services on the Domain Controller
+- Create Orginazational Units to contain Users and Admins
+- Link Client to the Domain
+- Generate Users with Powershell
+- Create a Group Policy for Users
+- Test Account Lockouts and Enable/Disable Accounts
+- Review Event Logs
 
 <h2>Deployment and Configuration Steps</h2>
 
 <p>
-First, we're going to set up a Virtual Network for the Active Directory. 
+1) To begin I'm going to set up a Virtual Network for the Active Directory within Azure. 
 </p>
 <p>
 <img src=https://i.imgur.com/i80ySIk.png/>
@@ -37,7 +44,7 @@ First, we're going to set up a Virtual Network for the Active Directory.
 <br />
 
 <p>
-Then we'll set up a VM to act as our Domain Controller. We'll use these settings and then review + create. 
+2) Now I want a Virtual Machine (VM) to act as our Domain Controller (DC-1). I'll use these settings and then review + create. 
 </p>
 <p>
 <img src=https://i.imgur.com/ykJITsb.png/>
@@ -46,7 +53,7 @@ Then we'll set up a VM to act as our Domain Controller. We'll use these settings
 <br />
 
 <p>
-We need at least one client machine, so we'll make another VM to fill that role. We'll use these settings and
+3) There needs to be at least one Client (Client-1), so I'll make another VM to fill that role. I'll use these settings and then review + create.
 </p>
 <p>
 <img src=https://i.imgur.com/2Z3fYZT.png/>
@@ -55,7 +62,7 @@ We need at least one client machine, so we'll make another VM to fill that role.
 <br />
 
 <p>
-Now that we have both VMs up and running, we need to set up DC-1 to have a static NIC private IP address. We can do this by going to into the Network settings for DC-1. From there we can see the Network Interface and IP Configuration and set it to static. Once we save it, it should remain static. 
+4) With both VMs up and running, I need to set up DC-1 to have a static NIC private IP address. This can be done in the Network settings for DC-1. You can see the Network Interface and IP Configuration and set it to static. Once saved, it should remain static. 
 </p>
 <p>
 <img src=https://i.imgur.com/ovdpShn.png/>
@@ -66,7 +73,7 @@ Now that we have both VMs up and running, we need to set up DC-1 to have a stati
 <br />
 
 <p>
-Now we're going to set our Client's DNS settings to DC-1's private IP address.  We'll get DC-1's private IP, and then in our Client's IP configuration under DNS servers, we can set it to DC-1's private IP and save it as a custom DNS. 
+5) With that done, DC-1's private IP address can be used. The Client-1's DNS settings can be set to DC-1's private IP address.  In Client-1's IP configuration, under DNS servers, it can be set to DC-1's private IP and saved as a custom DNS. 
 </p>
 <p>
 <img src=https://i.imgur.com/dGaKIl8.png/>
@@ -77,7 +84,7 @@ Now we're going to set our Client's DNS settings to DC-1's private IP address.  
 <br />
 
 <p>
-I've restarted Client-1, and now I'm going to log in and try to ping our DC-1's private IP address through PowerShell. From the search bar we can just search for Windows Powershell. Then, we'll just test by pinging our DC's private IP. I forgot to turn off the private firewall for this test originally, so I had to go back and do that. But as you can see, the Client is pinging the private IP of our DC.
+6) After restarting and logging into Client-1, I'm going to ping DC-1's private IP address through PowerShell. From the search bar we can open Windows Powershell and then ping DC-1's private IP. I forgot to turn off the private firewall for this test originally, so I had to go back and do that. With that fixed, Client-1 is pinging the private IP of the Domain Controller.
 </p>
 <p>
 <img src=https://i.imgur.com/KQLiN3A.png/>
@@ -86,17 +93,17 @@ I've restarted Client-1, and now I'm going to log in and try to ping our DC-1's 
 <br />
 
 <p>
-On the Domain Controller, we can turn off the firewalls to do our test ping by searching wf.msc. Within this window we can change the firewall properties, and just turn off the private firewall. Apply and Ok. Then we should be able to ping our DC unit from our Client unit. 
+7) On DC-1, you can turn off the firewalls to do our test ping by searching "wf.msc". Within this window you can change the firewall properties and turn off the private firewall. Apply and Ok. This should allow Client-1 to ping the DC-1.
 </p>
 <p>
 <img src=https://i.imgur.com/rmI70ND.png/>
   <img src=https://i.imgur.com/dpB32xW.png/>
   <img src=https://i.imgur.com/vwWotAl.png/>
-  
 </p>
 <br />
-Within DC we can now install Active Directory Domain Services. From our Server Manager (if it isn't already open for you, just locate it via the search bar), we're going to add roles and features. We only have one server option here, so we just continue and select Active Directory Domain Services and then add features. We can continue up to this point where it asks us if we want to restart if required. We'll check that box, say yes and install. 
+ 
 <p>
+  8) Within DC-1, Active Directory Domain Services (ADDS) can be installed. From the Server Manager (if it isn't already open for you, just locate it via the search bar), I'm going to add roles and features. There is only one server option for me here, so I just continue and select ADDS and then "add features". I continue up to this point where it asks if I want to restart if required. I'll check that box, say yes and install.
 </p>
 <p>
 <img src=https://i.imgur.com/W2mmocE.png/>
@@ -109,7 +116,7 @@ Within DC we can now install Active Directory Domain Services. From our Server M
 </p>
 
 <p>
-At this point, we're going to configure our DC to become a Domain Controller proper. From the Server Manager, we can see this flag prompting us. We'll promote this server to a domain controller and then opt to "add a new forest". We will just use "mydomain.com" as our root domain name. For the DSRM password we shouldn't ever need this, but still use something you can remember. We'll uncheck this "specify DNS delegation options" box and we can continue until we are prompted to install. After this finishes, it should automatically restart. 
+9) At this point, the DC-1 VM needs to be properly configured to become a Domain Controller. From the Server Manager, this flag is prompting me. I'll "promote this server to a Domain Controller" and then opt to "add a new forest". I'll use "mydomain.com" as the root domain name. For the DSRM password I shouldn't ever need this, but I'll use something memorable. I'll uncheck this "specify DNS delegation options" box and then continue until prompted to install. After this finishes, it should automatically restart. 
 </p>
 <p>
 <img src=https://i.imgur.com/JYSelxV.png/>
@@ -120,14 +127,14 @@ At this point, we're going to configure our DC to become a Domain Controller pro
 </p>
 
 <p>
-Now that DC is an actual Domain Controller, when we log back in, we need to specify the context in which we want to log back in. So to do this, we specify that we want to log into "mydomain.com" then using a "\" with the username. 
+10) Now that DC-1 is an actual Domain Controller, when I log back in, I need to specify the context in which I want to log back in. So to do this, you specify that you want to log into "mydomain.com" then using a "\" with the username. 
 </p>
 <p>
 <img src=https://i.imgur.com/WSRJDhy.png/>
 </p>
 
 <p>
-Next we'll create an Organizational Unit (OU) to contain our users and admins so we can do some testing later on. We do need to be specific in how we name these now, because it will impact us later. So we're going to use our start menu to open up Active Directory Users and Computers. We can take a look at mydomain.com's users, and computers here naturally so we see our "labuser" and DC-1. We're going to right click mydomain.com and add our OU for _EMPLOYEES and _ADMINS. We also want to add an admin, so we'll rightclick and create a new user in our _ADMINS folder. We'll keep it simple and add Jane Doe, password can be whatever we want as long as we remember it. I unticked the box for the prompt to change the password at next logon. 
+11) Next I'll create an Organizational Unit (OU) to contain the users and admins so I can do some testing later on. I need to be specific in how I name these now, because of a script I use later. I'll open up Active Directory Users and Computers (ADUC) from the start menu. I can take a look at mydomain.com's users and computers here, naturally, so we see our "labuser" and DC-1. Right clicking on mydomain.com I can add an OU for _EMPLOYEES and _ADMINS. I also want to add an admin, so I'll rightclick and create a new user in our _ADMINS folder. I'll keep it simple and add Jane Doe - password can be whatever as long as you remember it. I unticked the box for the prompt to change the password at next logon. 
 </p>
 <p>
 <img src=https://i.imgur.com/8Rw4WOI.png/>
@@ -144,7 +151,7 @@ Next we'll create an Organizational Unit (OU) to contain our users and admins so
 </p>
 
 <p>
-This account isn't an admin yet, despite us naming it admin and putting it in our admin group. We need to make a few changes. We'll change the properties by finding the "member of" tab and adding it to the "domain admins" built in group (click the check names button to make sure it locates it). Apply, OK and we can log out and then back in as our "jane_admin" user. 
+12) This account isn't an admin yet, despite us naming it admin and putting it in our admin group. I'll change the properties by finding the "member of" tab and adding it to the "domain admins" built in group (click the check names button to make sure it locates it). Apply, OK and then log out and back in as our "jane_admin" user. 
 </p>
 <p>
 <img src=https://i.imgur.com/cjqMSrd.png/>
@@ -154,7 +161,7 @@ This account isn't an admin yet, despite us naming it admin and putting it in ou
 </p>
 
 <p>
-Back on our Client-1, we're going to connect to our new domain. We can do this by rightclicking the start menu and selecting system. From here we can choose to "rename this PC (advanced)". We want to select change under the Computer Name tab, select Domain and put our "mydomain.com" or your selected domain name. Using our new admin, jane_admin's credentials we can OK this, get a sound notification of approval and a small popup in the back to let us know it worked. We'll be prompted to close our windows and restart. 
+13) Within Client-1, I'm going to connect to the new domain. This can be done by rightclicking the start menu and selecting system, then choosing to "rename this PC (advanced)". Select "Change" under the Computer Name tab, select Domain and put "mydomain.com" or your selected domain name. Using the new admin, jane_admin's credentials we can OK this. We get a sound notification of approval and a small popup in the back to let us know it worked. We'll be prompted to close our windows and restart. 
 </p>
 <p>
 <img src=https://i.imgur.com/uV3rIb5.png/>
@@ -165,7 +172,7 @@ Back on our Client-1, we're going to connect to our new domain. We can do this b
 </p>
 
 <p>
-Back in DC as jane_admin, we can check our Active Directory Users and Computers and verify that our Client-1 is part of our domain now. We're going to put it in a new OU and name it _CLIENTS and put our Client-1 in there. This isn't absolutely necessary, but just to keep it organized, we will. 
+14) Back in DC-1 as jane_admin, I'll check our Active Directory Users and Computers and verify that Client-1 is part of the domain now. I'm going to put it in a new OU and name it _CLIENTS and put Client-1 in there. This isn't absolutely necessary, but just to keep it organized, I will. 
 </p>
 <p>
 <img src=https://i.imgur.com/0LToeMq.png/>
@@ -173,7 +180,7 @@ Back in DC as jane_admin, we can check our Active Directory Users and Computers 
 </p>
 
 <p>
-Back in Client-1, we're going to log in as our jane_admin. This may take a few minutes. Once logged in, right click start and go to system. We're looking for Remote Desktop. Under User Accounts, we can select users to remotely access this PC, and add Domain Users. We can, and normally would make a Group Policy to do this and change many systems at once.
+15) Returning to Client-1, we're going to log in as our jane_admin. This may take a few minutes. Once logged in, right click start and go to system. We're looking for Remote Desktop. Under User Accounts, we can select users to remotely access this PC, and add Domain Users. We can, and normally would make a Group Policy to do this and change many systems at once.
 </p>
 <p>
 <img src=https://i.imgur.com/8Gszr8X.png/>
@@ -181,7 +188,7 @@ Back in Client-1, we're going to log in as our jane_admin. This may take a few m
 </p>
 
 <p>
-At this point, we need some users to play around with, so we'll go back to our DC-1 as jane_admin and start up Powershell ISE as an administrator. From within, we'll create a new file and we'll paste a script into it that will generate some random users for us. I'm using this one: (insert link here). I'll save the script as "CreateUsers" and just save it to the desktop. This will generate a bunch of new users for us when we run it, so we'll run it (F5 or the green arrow on the toolbar up top) and we can watch it go! In our ADUC we can see all the users already generated. 
+16) In order to get some users to work with, I'll go back to DC-1 as jane_admin and start up Powershell ISE as an administrator. I'll create a new file and paste a <a href="https://github.com/joshmadakor1/AD_PS/blob/master/Generate-Names-Create-Users.ps1">script</a> into it that will generate some random users for me. I'll save the script as "CreateUsers" and just save it to the desktop. This will generate a bunch of new users when run, so we'll run it (F5 or the green arrow on the toolbar up top) and we can watch it go! In our ADUC we can see all the users already generated. 
 </p>
 <p>
 <img src=https://i.imgur.com/wBfZRfS.png/>
@@ -192,7 +199,7 @@ At this point, we need some users to play around with, so we'll go back to our D
 </p>
 
 <p>
-We're going to pick one of these users to log in to our Client-1 with. This script generates them all with "Password1" as the password. I'm just going to pick one and give it a go! My target is dane.wafu. I still need to specify the context, so I'll login using "mydomain.con\dane.wafu". It's like magic to see things working, isn't it? I just opened Powershell to confirm I am indeed dane.wafu. Huzzah. 
+17) I'm going to pick one of these users to log in to our Client-1 with. This script generates them all with "Password1" as the password. I'm just going to pick one and give it a go! My target is "dane.wafu". I still need to specify the context, so I'll login using "mydomain.con\dane.wafu". It's like magic to see things working, isn't it? I just opened Powershell to confirm I am indeed dane.wafu. Huzzah. 
 </p>
 <p>
 <img src=https://i.imgur.com/kAnW4rV.png/>
@@ -201,7 +208,7 @@ We're going to pick one of these users to log in to our Client-1 with. This scri
 </p>
 
 <p>
-Now let's do a bit of testing and just get a feel for how account lockouts and password resets happen. Currently there is no threshold for this, so we could fail the password unlimited times. That's not safe! So we'll set a group policy for this. I'm going to open up Active Directory Users and Computers and find our user from before. We'll need to navigate here later, so I just want to have our user located already. 
+18) For a bit of testing, let's get a feel for how account lockouts and password resets happen. Currently there is no threshold for this, so I could fail the password unlimited times until I correctly guessed. That's not safe! So I'll set a Group Policy for this. I'm going to open up ADUC and find our user from before. We'll need to navigate here later, so I just want to have our user located already. 
 </p>
 <p>
 <img src=https://i.imgur.com/Q0vPgrn.png/>
@@ -210,7 +217,7 @@ Now let's do a bit of testing and just get a feel for how account lockouts and p
 <br />
 
 <p>
-So, to get our passwords to lock out after a few attempts, we're going to use the search bar in DC to look for "Group Policy Management". We can expand Forest:mydomain.com > Domains > mydomain.com and see "Default Domain Policy". We want to edit this with a right click. You may want to expand this window if you haven't already. We're looking to expand Computer Configuration > Policies > Window Settings > Security Settings > Account Policies > Account Lockout Policy. Feels a bit like a run-on sentence, but now we can set up some rules to test. Under the Account Lockout Policy, we're going to rightclick the account lockout duration properties and set it to 15 minutes. It should default the logon attempts to 5 after this. It may take a moment for our policy to refresh, but it doesn't take long. 
+19) So, to get the passwords to lock out after a few attempts, I'm going to use the search bar in DC-1 to look for "Group Policy Management". You can expand Forest:mydomain.com > Domains > mydomain.com and see "Default Domain Policy". I want to edit this with a right click. You may want to expand the window if you haven't already. I'm looking to expand Computer Configuration > Policies > Window Settings > Security Settings > Account Policies > Account Lockout Policy. Under the Account Lockout Policy, I'm going to rightclick the account lockout duration properties and set it to 15 minutes. It should default the logon attempts to 5 after this. It may take a moment for our policy to refresh, but it doesn't take long. 
 </p>
 <p>
 <img src=https://i.imgur.com/qicdw5P.png/>
@@ -220,7 +227,7 @@ So, to get our passwords to lock out after a few attempts, we're going to use th
 <br />
 
 <p>
-If we go to our Client-1 and attempt to logon incorrectly six times, we should be notified that we are locked out. If we look up our user on the DC in ADUC, we can look at their account and see that it is currently locked out because a box to unlock their account is now available for us to tick. We'll tick that box, Apply and OK and try to logon correctly now. We are now back in successfully!
+20) If I go to our Client-1 and attempt to logon incorrectly six times, I should be notified that I am now locked out. If I look up dane.wafu on DC-1 within the ADUC, I can look at their account and see that it is currently locked out. A box to unlock their account is now available for to tick. I'll tick that box, Apply and OK and try to logon correctly now. I am now back in successfully as dane.wafu.
 </p>
 <p>
   <img src=https://i.imgur.com/b6f30dk.png/>
@@ -232,7 +239,7 @@ If we go to our Client-1 and attempt to logon incorrectly six times, we should b
 <br />
 
 <p>
-Back in our Domain Controller, we're going to manually disable the account. If we find our user account like we have before in the ADUC, we can rightclick it and disable it. We can also do this from the account options. There's a box under where we unlocked it for the bad login attempts. Your choice. We can see what this looks like as our user by trying to logon again. We can just enable it by reversing this similar to how we disabled it. 
+21) Within DC-1, I'm going to manually disable the account. I'll locate the user account like before in the ADUC, rightclick it and disable it. I can also do this from the account options. There's a list of options under where I unlocked it for the bad login attempts. Your choice. I can see what this looks like as our user by trying to logon again. Then it can just be re-enabled by reversing this similar to how it was disabled.
 </p>
 <p>
 <img src=https://i.imgur.com/dsTGSQ5.png/>
@@ -243,7 +250,7 @@ Back in our Domain Controller, we're going to manually disable the account. If w
 <br />
 
 <p>
-We're going to take a look at the logs in the Client by opening the Event Viewer. I'm opening it as an admin so it will prompt me to use admin credentials. Even though we are logged into the Client-1 as our random user, if we have admin credentials we can still open it as our admin user. We can look under the Windows Logs and check Security to see related logs. If we use the find option, we can search our user and scroll through to see all of our "audit failures".
+22) I'm going to take a look at the logs in Client-1 by opening Event Viewer. I'm opening it as an admin, so it will prompt me to use admin credentials. Even though we are logged into the Client-1 as dane.wafu, if you have admin credentials you can still open it as an admin user. You can look under the Windows Logs and check Security to see related logs. If you use the find option, you can search for the user and scroll through to see all of our "audit failures".
 </p>
 <p>
 <img src=https://i.imgur.com/e0NEWnS.png/>
@@ -252,14 +259,3 @@ We're going to take a look at the logs in the Client by opening the Event Viewer
   <img src=https://i.imgur.com/a3yBCXL.png/>
 </p>
 <br />
-
-<p>
-text
-</p>
-<p>
-<img src=/>
-</p>
-<br />
-
-
-
